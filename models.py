@@ -157,7 +157,7 @@ class VED(nn.Module):
     def forward(self, x, labels):
 
         outputs = self.model(x, labels=labels)    
-        return outputs.loss
+        return outputs, outputs.loss
     
     def inference(self, x):
 

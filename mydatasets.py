@@ -14,9 +14,9 @@ from utils_ctc import sample_text_to_seq
 
 class myDatasetCTC(Dataset):
 
-    def __init__(self, processor, partition = "train"):
+    def __init__(self, partition = "train"):
         
-        self.processor = processor
+        self.processor = None
         self.partition = partition
 
         self.path_labels = paths.IMAGE_PATH
@@ -33,6 +33,9 @@ class myDatasetCTC(Dataset):
             self.label_list.append(' '.join(line[1:]))
 
         print("\tSamples Loaded: ", len(self.label_list), "\n-------------------------------------")
+
+    def set_processor(self, processor):
+        self.processor = processor
 
     def __len__(self):
         return len(self.image_name_list)
@@ -62,11 +65,11 @@ class myDatasetCTC(Dataset):
 ######################################################
 
 class myDatasetTransformerDecoder(Dataset):
-    def __init__(self, processor, partition="train"):
+    def __init__(self, partition="train"):
         
         self.max_length = paths.MAX_LENGTH
         self.partition = partition
-        self.processor = processor
+        self.processor = None
         self.ignore_id = -100
 
         self.path_img = paths.IMAGE_PATH
@@ -90,6 +93,9 @@ class myDatasetTransformerDecoder(Dataset):
 
     def dict2token(self, obj: Any):
         return obj["text_sequence"]
+    
+    def set_processor(self, processor):
+        self.processor = processor
 
     def __len__(self):
         return len(self.image_name_list)
@@ -119,4 +125,4 @@ class myDatasetTransformerDecoder(Dataset):
         labels = input_ids.clone()
         labels[labels == self.processor.tokenizer.pad_token_id] = self.ignore_id  # model doesn't need to predict pad token
 
-        return pixel_values, labels, target_sequence
+        return {"idx": idx, "img": pixel_values, "label": labels, "raw_label": target_sequence}
